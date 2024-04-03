@@ -6,10 +6,21 @@ public class Consulta {
     private int id;
     private Paciente paciente;
     private Medico medico;
+
     private Instant data;
     private String obsCancelamento;
     private String status;
 
+    String sql = "CREATE TABLE consulta ( " +
+            "id INT PRIMARY KEY AUTO_INCREMENT, " +
+            "id_paciente INT, " +
+            "id_medico INT, " +
+            "data DATETIME, " +
+            "obs_cancelamento VARCHAR(255), " +
+            "status VARCHAR(20), " +
+            "FOREIGN KEY (id_paciente) REFERENCES paciente(id), " +
+            "FOREIGN KEY (id_medico) REFERENCES medico(id) " +
+            ");";
     public Consulta() {
     }
 
@@ -20,6 +31,7 @@ public class Consulta {
         this.data = data;
         this.obsCancelamento = obsCancelamento;
         this.status = status;
+        System.out.println(data);
     }
 
     public int getId() {
@@ -69,4 +81,5 @@ public class Consulta {
     public void setStatus(String status) {
         this.status = status;
     }
+
 }

@@ -24,9 +24,11 @@ public class PacienteRepository {
             rs = ps.executeQuery();
             while (rs.next()) {
                 Paciente paciente = new Paciente();
+                paciente.setId(rs.getInt("ID_PACIENTE"));
                 paciente.setNome(rs.getString("NM_PACIENTE"));
                 paciente.setEmail(rs.getString("DS_EMAIL"));
                 paciente.setCpf(rs.getString("NR_CPF"));
+                paciente.setAtivo(rs.getString("ST_ATIVO"));
                 pacientes.add(paciente);
             }
         } catch (Exception e) {
@@ -54,9 +56,11 @@ public class PacienteRepository {
             rs = ps.executeQuery();
             if (rs.next()) {
                 Paciente paciente = new Paciente();
+                paciente.setId(rs.getInt("ID_PACIENTE"));
                 paciente.setNome(rs.getString("NM_PACIENTE"));
                 paciente.setEmail(rs.getString("DS_EMAIL"));
                 paciente.setCpf(rs.getString("NR_CPF"));
+                paciente.setAtivo(rs.getString("ST_ATIVO"));
 
                 return paciente;
             }

@@ -28,6 +28,7 @@ public class MedicoRepository {
                 medico.setNome(rs.getString("NM_MEDICO"));
                 medico.setEmail(rs.getString("DS_EMAIL"));
                 medico.setCrm(rs.getString("NR_CRM"));
+                medico.setAtivo(rs.getString("ST_ATIVO"));
                 medico.setEspecialidade(new EspecialidadeRepository().findById(rs.getInt("ID_ESPECIALIDADE")));
                 resultado.add(medico);
             }
@@ -56,6 +57,8 @@ public class MedicoRepository {
             rs = ps.executeQuery();
             if (rs.next()) {
                 Medico medico = new Medico();
+                medico.setId(rs.getInt("ID_MEDICO"));
+                medico.setAtivo(rs.getString("ST_ATIVO"));
                 medico.setNome(rs.getString("NM_MEDICO"));
                 medico.setEmail(rs.getString("DS_EMAIL"));
                 medico.setCrm(rs.getString("NR_CRM"));

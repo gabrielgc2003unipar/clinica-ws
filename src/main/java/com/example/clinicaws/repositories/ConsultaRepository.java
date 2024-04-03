@@ -4,12 +4,11 @@ import com.example.clinicaws.exceptions.ValidacaoException;
 import com.example.clinicaws.infra.ConnectionFactory;
 import com.example.clinicaws.model.Consulta;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -20,7 +19,7 @@ public class ConsultaRepository {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs    = null;
-        ArrayList<Consulta> resultado = new ArrayList<Consulta>();
+        ArrayList<Consulta> resultado = new ArrayList<>();
         String query = "SELECT * FROM consulta WHERE ST_CONSULTA = 'A' ORDER BY DT_CONSULTA ASC";
         try {
             conn = new ConnectionFactory().getConnection();
@@ -31,7 +30,9 @@ public class ConsultaRepository {
                 consulta.setId(rs.getInt("ID_CONSULTA"));
                 consulta.setMedico(new MedicoRepository().findById(rs.getInt("ID_MEDICO")));
                 consulta.setPaciente(new PacienteRepository().findById(rs.getInt("ID_PACIENTE")));
-                consulta.setData(Instant.from(Instant.ofEpochMilli(rs.getDate("DT_CONSULTA").getTime()).atZone(ZoneId.systemDefault()).toLocalDate()));
+
+                Instant instant = rs.getTimestamp("DT_CONSULTA").toInstant().minus(3, ChronoUnit.HOURS);
+                consulta.setData(instant);
                 consulta.setStatus(rs.getString("ST_CONSULTA"));
                 consulta.setObsCancelamento(rs.getString("DS_OBSCANCELAMENTO"));
                 resultado.add(consulta);
@@ -65,7 +66,8 @@ public class ConsultaRepository {
                 consulta.setId(rs.getInt("ID_CONSULTA"));
                 consulta.setMedico(new MedicoRepository().findById(rs.getInt("ID_MEDICO")));
                 consulta.setPaciente(new PacienteRepository().findById(rs.getInt("ID_PACIENTE")));
-                consulta.setData(Instant.from(Instant.ofEpochMilli(rs.getDate("DT_CONSULTA").getTime()).atZone(ZoneId.systemDefault()).toLocalDate()));
+                Instant instant = rs.getTimestamp("DT_CONSULTA").toInstant();
+                consulta.setData(instant);
                 consulta.setStatus(rs.getString("ST_CONSULTA"));
                 consulta.setObsCancelamento(rs.getString("DS_OBSCANCELAMENTO"));
                 return consulta;
@@ -116,7 +118,12 @@ public class ConsultaRepository {
             ps = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setInt(1, consulta.getMedico().getId());
             ps.setInt(2, consulta.getPaciente().getId());
-            ps.setDate(3, (java.sql.Date) Date.from(consulta.getData()));
+            OffsetDateTime offsetDateTime = OffsetDateTime.parse(consulta.getData().toString());
+            Instant instant = offsetDateTime.toInstant();
+            Instant novoInstant = instant.plus(3, ChronoUnit.HOURS);
+            Timestamp timestamp = new Timestamp(Date.from(novoInstant).getTime());
+
+            ps.setTimestamp(3, timestamp);
             ps.setString(4, "A");
             ps.execute();
             rs = ps.getGeneratedKeys();

@@ -1,6 +1,8 @@
 package com.example.clinicaws.interfaces;
 
-import com.example.clinicaws.model.Consulta;
+import com.example.clinicaws.dto.consulta.ConsultaDTO;
+import com.example.clinicaws.dto.medico.MedicoDTO;
+import com.example.clinicaws.dto.paciente.PacienteDTO;
 import com.example.clinicaws.model.Especialidade;
 import com.example.clinicaws.model.Medico;
 import com.example.clinicaws.model.Paciente;
@@ -12,26 +14,26 @@ import java.util.ArrayList;
 @WebService
 public interface IClinicaWebService {
     @WebMethod
-    ArrayList<Medico> findAllMedico();
+    ArrayList<MedicoDTO> findAllMedico();
     @WebMethod
-    Medico findByIdMedico(int id);
+    MedicoDTO findByIdMedico(int id);
     @WebMethod
     void deleteMedico(int id);
     @WebMethod
-    Medico insertMedico(Medico medico);
+    MedicoDTO insertMedico(Medico medico);
     @WebMethod
-    Medico updateMedico(Medico medico);
+    MedicoDTO updateMedico(Medico medico);
 
     @WebMethod
-    ArrayList<Paciente> findAllPaciente();
+    ArrayList<PacienteDTO> findAllPaciente();
     @WebMethod
-    Paciente findByIdPaciente(int id);
+    PacienteDTO findByIdPaciente(int id);
     @WebMethod
     void deletePaciente(int id);
     @WebMethod
-    Paciente insertPaciente(Paciente paciente);
+    PacienteDTO insertPaciente(Paciente paciente);
     @WebMethod
-    Paciente updatePaciente(Paciente paciente);
+    PacienteDTO updatePaciente(Paciente paciente);
 
     @WebMethod
     ArrayList<Especialidade> findAllEspecialidade();
@@ -44,11 +46,11 @@ public interface IClinicaWebService {
     @WebMethod
     Especialidade updateEspecialidade(Especialidade especialidade);
     @WebMethod
-    ArrayList<Consulta> findAllConsulta();
+    ArrayList<ConsultaDTO> findAllConsulta();
     @WebMethod
-    Consulta findByIdConsulta(int id);
+    ConsultaDTO findByIdConsulta(int id);
     @WebMethod
     void deleteConsulta(int id, String obs);
     @WebMethod
-    Consulta insertConsulta(Consulta consulta);
+    ConsultaDTO insertConsulta(ConsultaDTO consulta);
 }

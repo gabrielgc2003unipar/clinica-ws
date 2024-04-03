@@ -1,9 +1,12 @@
 package com.example.clinicaws;
 
-import java.io.*;
 import java.sql.SQLException;
+import java.time.*;
 import java.util.ArrayList;
 
+import com.example.clinicaws.dto.consulta.ConsultaDTO;
+import com.example.clinicaws.dto.medico.MedicoDTO;
+import com.example.clinicaws.dto.paciente.PacienteDTO;
 import com.example.clinicaws.exceptions.ValidacaoException;
 import com.example.clinicaws.interfaces.IClinicaWebService;
 import com.example.clinicaws.model.Consulta;
@@ -21,9 +24,19 @@ import jakarta.jws.WebService;
 public class ClinicaWebService implements IClinicaWebService {
 
     @Override
-    public ArrayList<Medico> findAllMedico() {
+    public ArrayList<MedicoDTO> findAllMedico() {
         try {
-            return new MedicoService().findAll();
+            ArrayList<MedicoDTO> medicosDTO = new ArrayList<>();
+            ArrayList<Medico> medicos = new MedicoService().findAll();
+            for (Medico medico : medicos) {
+                MedicoDTO medicoDTO = new MedicoDTO();
+                medicoDTO.setNome(medico.getNome());
+                medicoDTO.setCrm(medico.getCrm());
+                medicoDTO.setEmail(medico.getEmail());
+                medicoDTO.setEspecialidade(medico.getEspecialidade().getDescricao());
+                medicosDTO.add(medicoDTO);
+            }
+            return medicosDTO;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -31,9 +44,15 @@ public class ClinicaWebService implements IClinicaWebService {
     }
 
     @Override
-    public Medico findByIdMedico(int id) {
+    public MedicoDTO findByIdMedico(int id) {
         try {
-            return new MedicoService().findById(id);
+            Medico medico = new MedicoService().findById(id);
+            MedicoDTO medicoDTO = new MedicoDTO();
+            medicoDTO.setNome(medico.getNome());
+            medicoDTO.setCrm(medico.getCrm());
+            medicoDTO.setEmail(medico.getEmail());
+            medicoDTO.setEspecialidade(medico.getEspecialidade().getDescricao());
+            return medicoDTO;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -50,9 +69,15 @@ public class ClinicaWebService implements IClinicaWebService {
     }
 
     @Override
-    public Medico insertMedico(Medico medico) {
+    public MedicoDTO insertMedico(Medico medico) {
         try {
-            return new MedicoService().insert(medico);
+            MedicoDTO medicoDTO = new MedicoDTO();
+            Medico medicoInserido = new MedicoService().insert(medico);
+            medicoDTO.setNome(medicoInserido.getNome());
+            medicoDTO.setCrm(medicoInserido.getCrm());
+            medicoDTO.setEmail(medicoInserido.getEmail());
+            medicoDTO.setEspecialidade(medicoInserido.getEspecialidade().getDescricao());
+            return medicoDTO;
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ValidacaoException e) {
@@ -62,9 +87,15 @@ public class ClinicaWebService implements IClinicaWebService {
     }
 
     @Override
-    public Medico updateMedico(Medico medico) {
+    public MedicoDTO updateMedico(Medico medico) {
         try {
-            return new MedicoService().update(medico);
+            MedicoDTO medicoDTO = new MedicoDTO();
+            Medico medicoAtualizado = new MedicoService().update(medico);
+            medicoDTO.setNome(medicoAtualizado.getNome());
+            medicoDTO.setCrm(medicoAtualizado.getCrm());
+            medicoDTO.setEmail(medicoAtualizado.getEmail());
+            medicoDTO.setEspecialidade(medicoAtualizado.getEspecialidade().getDescricao());
+            return medicoDTO;
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ValidacaoException e) {
@@ -74,9 +105,18 @@ public class ClinicaWebService implements IClinicaWebService {
     }
 
     @Override
-    public ArrayList<Paciente> findAllPaciente() {
+    public ArrayList<PacienteDTO> findAllPaciente() {
         try {
-            return new PacienteService().findAll();
+            ArrayList<PacienteDTO> pacientesDTO = new ArrayList<>();
+            ArrayList<Paciente> pacientes = new PacienteService().findAll();
+            for (Paciente paciente : pacientes) {
+                PacienteDTO pacienteDTO = new PacienteDTO();
+                pacienteDTO.setNome(paciente.getNome());
+                pacienteDTO.setCpf(paciente.getCpf());
+                pacienteDTO.setEmail(paciente.getEmail());
+                pacientesDTO.add(pacienteDTO);
+            }
+            return pacientesDTO;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -84,9 +124,14 @@ public class ClinicaWebService implements IClinicaWebService {
     }
 
     @Override
-    public Paciente findByIdPaciente(int id) {
+    public PacienteDTO findByIdPaciente(int id) {
         try {
-            return new PacienteService().findById(id);
+            Paciente paciente = new PacienteService().findById(id);
+            PacienteDTO pacienteDTO = new PacienteDTO();
+            pacienteDTO.setNome(paciente.getNome());
+            pacienteDTO.setCpf(paciente.getCpf());
+            pacienteDTO.setEmail(paciente.getEmail());
+            return pacienteDTO;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -103,9 +148,14 @@ public class ClinicaWebService implements IClinicaWebService {
     }
 
     @Override
-    public Paciente insertPaciente(Paciente paciente) {
+    public PacienteDTO insertPaciente(Paciente paciente) {
         try {
-            return new PacienteService().insert(paciente);
+            PacienteDTO pacienteDTO = new PacienteDTO();
+            Paciente pacienteInserido = new PacienteService().insert(paciente);
+            pacienteDTO.setNome(pacienteInserido.getNome());
+            pacienteDTO.setCpf(pacienteInserido.getCpf());
+            pacienteDTO.setEmail(pacienteInserido.getEmail());
+            return pacienteDTO;
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ValidacaoException e) {
@@ -115,9 +165,14 @@ public class ClinicaWebService implements IClinicaWebService {
     }
 
     @Override
-    public Paciente updatePaciente(Paciente paciente) {
+    public PacienteDTO updatePaciente(Paciente paciente) {
         try {
-            return new PacienteService().update(paciente);
+            PacienteDTO pacienteDTO = new PacienteDTO();
+            Paciente pacienteAtualizado = new PacienteService().update(paciente);
+            pacienteDTO.setNome(pacienteAtualizado.getNome());
+            pacienteDTO.setCpf(pacienteAtualizado.getCpf());
+            pacienteDTO.setEmail(pacienteAtualizado.getEmail());
+            return pacienteDTO;
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ValidacaoException e) {
@@ -180,18 +235,38 @@ public class ClinicaWebService implements IClinicaWebService {
     }
 
     @Override
-    public ArrayList<Consulta> findAllConsulta() {
+    public ArrayList<ConsultaDTO> findAllConsulta() {
         try {
-            return new ConsultaService().findAll();
+            ArrayList<ConsultaDTO> consultasDTO = new ArrayList<>();
+            ArrayList<Consulta> consultas = new ConsultaService().findAll();
+            for (Consulta consulta : consultas) {
+                ConsultaDTO consultaDTO = new ConsultaDTO();
+                consultaDTO.setId(consulta.getId());
+                consultaDTO.setData(consulta.getData().toString());
+                consultaDTO.setMedicoId(consulta.getMedico().getId());
+                consultaDTO.setPacienteId(consulta.getPaciente().getId());
+                consultaDTO.setStatus(consulta.getStatus());
+                consultaDTO.setObsCancelamento(consulta.getObsCancelamento());
+                consultasDTO.add(consultaDTO);
+            }
+            return consultasDTO;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Consulta findByIdConsulta(int id) {
+    public ConsultaDTO findByIdConsulta(int id) {
         try {
-            return new ConsultaService().findById(id);
+            Consulta consulta = new ConsultaService().findById(id);
+            ConsultaDTO consultaDTO = new ConsultaDTO();
+            consultaDTO.setId(consulta.getId());
+            consultaDTO.setData(consulta.getData().toString());
+            consultaDTO.setMedicoId(consulta.getMedico().getId());
+            consultaDTO.setPacienteId(consulta.getPaciente().getId());
+            consultaDTO.setStatus(consulta.getStatus());
+            consultaDTO.setObsCancelamento(consulta.getObsCancelamento());
+            return consultaDTO;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -209,9 +284,30 @@ public class ClinicaWebService implements IClinicaWebService {
     }
 
     @Override
-    public Consulta insertConsulta(Consulta consulta) {
+    public ConsultaDTO insertConsulta(ConsultaDTO consulta) {
+        Consulta consultaModel = new Consulta();
+        OffsetDateTime offsetDateTime = OffsetDateTime.parse(consulta.getData());
+        Instant instant = offsetDateTime.toInstant();
+        consultaModel.setData(instant);
         try {
-            return new ConsultaService().insert(consulta);
+            consultaModel.setMedico(new MedicoService().findById(consulta.getMedicoId()));
+            consultaModel.setPaciente(new PacienteService().findById(consulta.getPacienteId()));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        consultaModel.setStatus(consulta.getStatus());
+        consultaModel.setObsCancelamento(consulta.getObsCancelamento());
+        consultaModel.setId(consulta.getId());
+        try {
+            ConsultaDTO consultaDTO = new ConsultaDTO();
+            Consulta consultaInserida = new ConsultaService().insert(consultaModel);
+            consultaDTO.setId(consultaInserida.getId());
+            consultaDTO.setData(consultaInserida.getData().toString());
+            consultaDTO.setMedicoId(consultaInserida.getMedico().getId());
+            consultaDTO.setPacienteId(consultaInserida.getPaciente().getId());
+            consultaDTO.setStatus(consultaInserida.getStatus());
+            consultaDTO.setObsCancelamento(consultaInserida.getObsCancelamento());
+            return consultaDTO;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } catch (ValidacaoException e) {

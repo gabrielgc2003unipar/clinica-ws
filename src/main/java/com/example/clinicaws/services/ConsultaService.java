@@ -41,7 +41,7 @@ public class ConsultaService {
     public Consulta insert(Consulta consulta) throws SQLException, ValidacaoException {
         MedicoService medicoService = new MedicoService();
         PacienteService pacienteService = new PacienteService();
-        List<Consulta> consultas = findAll();
+        List<Consulta> consultas = new ConsultaService().findAll();
 
         ArrayList<Medico> medicos = medicoService.findAll();
         if (medicos.isEmpty()) {
@@ -55,7 +55,10 @@ public class ConsultaService {
         if (consulta.getData() == null) {
             throw new ValidacaoException("Data/Hora é obrigatória");
         }
-        if (consulta.getData().isBefore(Instant.from(LocalDate.now())) || consulta.getData().equals(Instant.from(LocalDate.now()))){
+        if (consulta.getData().isBefore(Instant.now())) {
+            throw new ValidacaoException("Data/Hora deve ser maior que a data atual");
+        }
+        if (consulta.getData().equals(Instant.now())) {
             throw new ValidacaoException("Data/Hora deve ser maior que a data atual");
         }
 
@@ -66,7 +69,7 @@ public class ConsultaService {
             throw new ValidacaoException("Não é possível agendar consultas aos finais de semana");
         }
         //Valida horário de atendimento
-        LocalTime horaConsulta = LocalTime.ofInstant(consulta.getData(), ZoneId.systemDefault());
+        LocalTime horaConsulta = LocalTime.ofInstant(consulta.getData(), ZoneId.systemDefault()).plusHours(3);
         if (horaConsulta.getHour() < 7 || horaConsulta.getHour() > 18) {
             throw new ValidacaoException("O horário de atendimento é das 07:00 as 18:00, informe um horário válido");
         }
@@ -76,6 +79,11 @@ public class ConsultaService {
         if (horaConsulta.isAfter(horaAtual.plusMinutes(30))) {
             System.out.println("Consulta agendada com antecedência mínima de 30 minutos.");
         }
+        /*
+        if (horaAtual.getHour() < 7 || horaAtual.getHour() > 18) {
+            throw new ValidacaoException("O horário de atendimento é das 07:00 as 18:00, não é possível realizar agendamento fora do horário de atendimento");
+        }
+         */
 
 
         //A escolha do médico é opcional, sendo que nesse caso o sistema deve escolher
@@ -101,13 +109,12 @@ public class ConsultaService {
                 Random random = new Random();
                 Medico medicoSelecionado = medicosDisponiveis.get(random.nextInt(medicosDisponiveis.size()));
 
-                // Agora você pode usar o médico selecionado conforme necessário
-                System.out.println("Médico selecionado aleatoriamente: " + medicoSelecionado);
+                // Define o médico selecionado na consulta
+                consulta.setMedico(medicoSelecionado);
             } else {
-                System.out.println("Não há médicos disponíveis para consulta ou todos estão ocupados.");
+                throw new ValidacaoException("Não há médicos disponíveis para a data/hora especificada");
             }
         }
-
 
         consulta.setMedico(medicoService.findById(consulta.getMedico().getId()));
         //Não permitir o agendamento de consultas com médicos inativos no sistema;
@@ -135,7 +142,10 @@ public class ConsultaService {
         //paciente;
         for (Consulta c : consultas) {
             if (c.getPaciente().getId() == consulta.getPaciente().getId()) {
-                if (LocalDate.from(c.getData()).isEqual(LocalDate.from(consulta.getData()))) {
+                ZonedDateTime zonedDateTimeC = c.getData().atZone(ZoneId.systemDefault());
+                ZonedDateTime zonedDateTimeConsulta = consulta.getData().atZone(ZoneId.systemDefault());
+
+                if (LocalDate.from(zonedDateTimeC).isEqual(LocalDate.from(zonedDateTimeConsulta))) {
                     throw new ValidacaoException("Paciente já possui consulta agendada para este dia");
                 }
             }
@@ -148,7 +158,9 @@ public class ConsultaService {
 
     private boolean temSobreposicaoDeHorario(Consulta novaConsulta, List<Consulta> consultas, Medico medico) {
         // Obtém a data e hora da nova consulta
-        LocalDateTime inicioNovaConsulta = LocalDateTime.from(novaConsulta.getData());
+        Instant instant = novaConsulta.getData();
+        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("UTC")); // ou qualquer outra zona de fuso horário que você deseje usar
+        LocalDateTime inicioNovaConsulta = zonedDateTime.toLocalDateTime();
         LocalDateTime fimNovaConsulta = inicioNovaConsulta.plusHours(1); // Supondo que cada consulta dure 1 hora
 
         // Verifica cada consulta do médico para verificar se há sobreposição de horário
@@ -156,7 +168,7 @@ public class ConsultaService {
             // Verifica se a consultaExistente é do médico atual
             if (medico.getId() == consultaExistente.getMedico().getId()) {
                 // Obtém a data e hora da consultaExistente
-                LocalDateTime inicioConsultaExistente = LocalDateTime.from(consultaExistente.getData());
+                LocalDateTime inicioConsultaExistente = LocalDateTime.ofInstant(consultaExistente.getData(), ZoneId.systemDefault()).plusHours(3);
                 LocalDateTime fimConsultaExistente = inicioConsultaExistente.plusHours(1); // Supondo que cada consulta dure 1 hora
 
                 // Verifica se há sobreposição de horário
